@@ -43,3 +43,8 @@ Set your environment variables in the `.env` file. Like `OPENAI_API_KEY` value.
 ```bash
 $uvicorn main:app --reload --port 4000
 ```
+
+### for run a docker compose
+```bash
+$ docker compose up -d --build  # -d ==> run in background
+```
