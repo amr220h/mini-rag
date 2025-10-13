@@ -3,7 +3,8 @@ from .BaseController import BaseController
 from .ProjectController import ProjectController
 import os
 from models import ProcessingEnum
-from langchain.document_loaders import TextLoader,PyMuPDFLoader
+from langchain_community.document_loaders import TextLoader,PyMuPDFLoader
+
 
 class ProcessController(BaseController):
     def __init__(self,project_id:str):
