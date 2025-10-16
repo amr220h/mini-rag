@@ -15,3 +15,17 @@ class Project(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+
+    @classmethod
+    def get_indexes(cls):
+        return [
+            {
+                'key': [
+
+                    ("project_id",1 ) #? MongoDB will index all documents by project_id in ascending = 1 order 
+                ],
+                'name': "project_id_index_1", 
+                "unique": True
+            }
+        ]

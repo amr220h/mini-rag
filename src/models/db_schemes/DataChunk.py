@@ -11,3 +11,17 @@ class DataChunk(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+
+    @classmethod
+    def get_indexes(cls):
+        return [
+            {
+                'key': [
+
+                    ("chunk_project_id",1 ) #? MongoDB will index all documents by chunk_project_id in ascending = 1 order 
+                ],
+                'name': "chunk_project_id_index_1", 
+                "unique": False  #? It is false because I have more than one chunk that takes up the project_id
+            }
+        ]
