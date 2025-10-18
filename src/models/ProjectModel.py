@@ -9,7 +9,6 @@ class ProjectModel(BaseDataModel):
         self.collection = self.db_client[DataBaseEnum.COLLECTION_PROJECT_NAME.value]
 
     @classmethod 
-
     async def create_instance(cls,db_client:object):
         instance = cls(db_client)
         await instance.init_collection()

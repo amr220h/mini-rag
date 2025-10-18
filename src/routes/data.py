@@ -5,10 +5,12 @@ from fastapi.responses import JSONResponse
 from models import ResponseSignal
 from helpers.config import get_settings,Settings
 from controllers import DataController,ProjectController,ProcessController
-from models.db_schemes import DataChunk
+from models.db_schemes import DataChunk,Asset
 from .schemas.data import ProcessRequest
 from models.ProjectModel import ProjectModel
+from models.AssetModel import AssetModel
 from models.ChunkModel import ChunkModel
+from models.enums.AssetTypeEnum import AssetTypeEnum
 
 import logging
 
@@ -54,11 +56,23 @@ async def upload_data(request:Request,project_id: str,file:UploadFile,app_settin
                    'signal':ResponseSignal.FILE_UPLOADED_FAILED.value,
                 }
                )
+    #store the assets into the detabase
+    asset_model = await AssetModel.create_instance(
+        db_client= request.app.db_client
+    )
+    asset_resource = Asset(
+        asset_project_id=project.id,
+        asset_type= AssetTypeEnum.FILE.value,
+        asset_name = file_id,
+        asset_size = os.path.getsize(file_path)
 
+    )
+
+    asset_record =await asset_model.create_asset(asset= asset_resource)
     return JSONResponse(
                content={
                    'signal':ResponseSignal.FILE_UPLOADED_SUCCESSFULLY.value,
-                   "file_id":file_id
+                   "file_id":str(asset_record.id)
                 }
                )
 @base_router.post('/process/{project_id}')
