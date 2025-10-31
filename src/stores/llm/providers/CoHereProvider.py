@@ -1,7 +1,10 @@
 import logging
-from LLMinterface import LLMInterface
-from LLMEnums import CoHereEnum,DocumentType
+
+
 import cohere
+
+from stores.llm.LLMEnums import CoHereEnum, DocumentEnum
+from stores.llm.LLMinterface import LLMInterface
 
 class CoHereProvider(LLMInterface):
     def __init__(self,api_key:str,
@@ -20,7 +23,7 @@ class CoHereProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_size  = None
 
-        self.client = cohere.client(
+        self.client = cohere.Client(
             api_key=self.api_key)
         
         self.logger = logging.getLogger(__name__)
@@ -60,30 +63,36 @@ class CoHereProvider(LLMInterface):
             return None
         return response.text
     
-    def embed_text(self, text:str,docunemt_type:str = None):
+    def embed_text(self, text:str, document_type:str = None):  # ✅ تصحيح docunemt_type إلى document_type
         if not self.client:
-            self.logger.error("OpenAI client is not initialized.")
+            self.logger.error("Cohere client is not initialized.")
             return None
-         
+        
         if not self.embedding_model_id:
             self.logger.error("Embedding model is not set.")
             return None
-        input_type == CoHereEnum.DOCUMENT
-        if docunemt_type == DocumentType.QUERY.value:
-            input_type = CoHereEnum.QUERY.value
+        
+        input_type = CoHereEnum.DOCUMENT
+
+        if document_type == DocumentEnum.QUERY:  # ✅ تصحيح هنا أيضاً
+            input_type = CoHereEnum.QUERY
+
         response = self.client.embed(
             model = self.embedding_model_id,
             texts = [self.process_text(text)],
             input_type = input_type,
-            embedding_type = ['float']
+            embedding_types = ['float']
         )
+
         if not response or not response.embeddings or not response.embeddings.float:
             self.logger.error("No embedding received from Cohere API.")
             return None
+        
         return response.embeddings.float[0]
 
 
     def construct_prompt(self, prompt:str, role:str):
+
         return{
             "role": role,
             "text": self.process_text(prompt)

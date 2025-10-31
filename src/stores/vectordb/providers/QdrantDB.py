@@ -1,10 +1,13 @@
 from typing import List
-from ..VectorDBinterface import VectorDBInterface
+
 from qdrant_client import QdrantClient,models
+
+from stores.vectordb.VectorDBinterface import vectordbInterface
+
 from ..VectorDBEnums import VectorDBEnums, DistanceMethodEnums
 import logging
 
-class QdrantDB(VectorDBInterface):
+class QdrantDB(vectordbInterface):
     def __init__(self,db_path:str,distance_method:str):
 
         self.client = None
@@ -26,10 +29,10 @@ class QdrantDB(VectorDBInterface):
         self.client = None
 
     def is_collection_existed(self, collection_name: str) -> bool:
-        collections = self.client.collection_exists(collection_name=collection_name)
+       return self.client.collection_exists(collection_name=collection_name)
     
     def list_all_collection(self) ->List:
-        collections = self.client.get_collections()
+       return self.client.get_collections()
 
     def get_collection_info(self ,collection_name:str):
         collection_info = self.client.get_collection(collection_name=collection_name)
@@ -73,7 +76,7 @@ class QdrantDB(VectorDBInterface):
                 collection_name=collection_name,
                 records=[
                     models.Record(
-                        id=record_id,
+                        id=[record_id],
                         vector=vector,
                         payload={
                             "text": text,
@@ -101,16 +104,19 @@ class QdrantDB(VectorDBInterface):
             metadata = [None] * len(texts)
 
         if record_ids is None:
-            record_ids = [None] * len(texts)
+            record_ids = list(range(0,len(texts)))
 
         for i in range(0, len(vectors), batch_size):
             batch_end = i+batch_size
             batch_vectors = vectors[i:batch_end]
             batch_texts = texts[i:batch_end]
             batch_metadata = metadata[i:batch_end]
+            batch_record_ids = record_ids[i:batch_end]
             
             bath_records=[
-                models.Record(vectors=batch_vectors[x],
+                models.Record(
+                    id = batch_record_ids[x],
+                    vectors=batch_vectors[x],
                 payload={
                     "text": batch_texts[x],
                     "metadata": batch_metadata[x]

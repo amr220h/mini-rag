@@ -15,12 +15,12 @@ from models.enums.AssetTypeEnum import AssetTypeEnum
 import logging
 
 logger = logging.getLogger('uvicorn.error')
-base_router = APIRouter(
+data_router = APIRouter(
     prefix="/api/v1/data",
     tags=["api_v1"],
 )
 
-@base_router.post("/upload/{project_id}")
+@data_router.post("/upload/{project_id}")
 async def upload_data(request:Request,project_id: str,file:UploadFile,app_settings:Settings = Depends(get_settings)):
 
     project_model =await ProjectModel.create_instance(
@@ -75,7 +75,7 @@ async def upload_data(request:Request,project_id: str,file:UploadFile,app_settin
                    "file_id":str(asset_record.id)
                 }
                )
-@base_router.post('/process/{project_id}')
+@data_router.post('/process/{project_id}')
 async def process_endpoint(request:Request,project_id:str,process_request:ProcessRequest):
     
     chunk_size = process_request.chunk_size
